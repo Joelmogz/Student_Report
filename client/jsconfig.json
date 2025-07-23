@@ -1,0 +1,9 @@
+ /** @type {import('tailwindcss').Config} */
+ {
+    "compilerOptions": {
+      "baseUrl": ".",
+      "paths": {
+        "@/*": ["src/*"]
+      }
+    }
+  }
