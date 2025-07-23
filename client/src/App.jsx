@@ -7,6 +7,7 @@ import StudentDashboard from './pages/StudentDashboard';
 import NotFound from './pages/NotFound';
 import Navbar from './components/Navbar';
 import  useAuth  from './context/AuthContext';
+import { Toaster } from './components/ui/sonner';
 
 function ProtectedRoute({ children, role }) {
   const { user } = useAuth();
@@ -19,6 +20,7 @@ function App() {
   return (
     <Router>
       <Navbar />
+      <Toaster />
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<LoginPage />} />

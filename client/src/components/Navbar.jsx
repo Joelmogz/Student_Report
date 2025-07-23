@@ -1,19 +1,22 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import useAuth from "@/context/AuthContext";
 
-export default function Navbar(user) {
-    const {logout} = useAuth();
+export default function Navbar() {
+    const { user, logout } = useAuth();
     return (
-        <nav className="flex justify-between items-center p-4 bg-gray-800 text-white">
-            <Link to="/">Home</Link>
-            {user?.role === 'admin' && <Link to="/admin">Admin Dashboard</Link>}
-            {user?.role === 'student' && <Link to="/student">Student Dashboard</Link>}
-            {!user && <Link to="/login">Login</Link>}
-            {!user && <Link to="/register">Register</Link>}
-            {user && <Button onClick={logout}>Logout</Button>}
-        </nav>
+        <div className="navbar bg-base-200 shadow mb-4">
+            <div className="flex-1">
+                <Link to="/" className="btn btn-ghost text-xl">Student Report</Link>
+            </div>
+            <div className="flex-none gap-2">
+                {user?.role === 'admin' && <Link to="/admin" className="btn btn-ghost">Admin Dashboard</Link>}
+                {user?.role === 'student' && <Link to="/student" className="btn btn-ghost">Student Dashboard</Link>}
+                {!user && <Link to="/login" className="btn btn-outline">Login</Link>}
+                {!user && <Link to="/register" className="btn btn-primary">Register</Link>}
+                {user && <button className="btn btn-error" onClick={logout}>Logout</button>}
+            </div>
+        </div>
     );
-};
+}
 
 

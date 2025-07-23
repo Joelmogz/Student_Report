@@ -3,45 +3,46 @@ import { Button } from "@/components/ui/button";
 
 
 export default function MarksTable({marks, onEdit, onDelete, onRemark}) {
-
     if(!marks || marks.length === 0) {
-        return <p className="font-bold text-red-500 text-3xl">No Marks found</p>
-
+        return <p className="font-bold text-error text-3xl">No Marks found</p>
     }
-
     return (
-        <Table>
-            <TableCaption className="text-gray-200 font-italic">My Marks</TableCaption>
-            <TableHeader className="flex justify-between bg-gray-200 items-center">
-                <TableRow>
-                    <TableHead>Subject</TableHead>
-                    <TableHead>Marks</TableHead>
-                    <TableHead>Grade</TableHead>
-                    <TableHead>Remarks</TableHead>
-                    {onEdit || onDelete || onRemark ?<TableHead>Actions</TableHead> : null }
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {marks.map(student => (
-                    <TableRow key={mark._id}>
-                        <TableCell>{mark.subject}</TableCell>
-                        <TableCell>{marks.marks}</TableCell>
-                        <TableCell>{mark.grade}</TableCell>
-                        <TableCell>{mark.remarks}</TableCell>
-                        <TableCell>
-                            {onEdit && (
-                                <Button onClick = {() => onEdit(mark)}>Edit</Button>
+        <div className="overflow-x-auto">
+            <table className="table table-zebra w-full">
+                <caption className="text-base-content font-italic mb-2">My Marks</caption>
+                <thead>
+                    <tr className="bg-base-200">
+                        <th>Subject</th>
+                        <th>Marks</th>
+                        <th>Grade</th>
+                        <th>Remarks</th>
+                        {(onEdit || onDelete || onRemark) && <th>Actions</th>}
+                    </tr>
+                </thead>
+                <tbody>
+                    {marks.map(mark => (
+                        <tr key={mark._id}>
+                            <td>{mark.subject}</td>
+                            <td>{mark.marks}</td>
+                            <td>{mark.grade}</td>
+                            <td>{mark.remarks}</td>
+                            {(onEdit || onDelete || onRemark) && (
+                                <td className="flex gap-2">
+                                    {onEdit && (
+                                        <button className="btn btn-warning btn-xs" onClick={() => onEdit(mark)}>Edit</button>
+                                    )}
+                                    {onDelete && (
+                                        <button className="btn btn-error btn-xs" onClick={() => onDelete(mark)}>Delete</button>
+                                    )}
+                                    {onRemark && (
+                                        <button className="btn btn-info btn-xs" onClick={() => onRemark(mark)}>Remark</button>
+                                    )}
+                                </td>
                             )}
-                            {onDelete && (
-                                <Button onClick = {() => onDelete(mark)}>Delete</Button>
-                            )}
-                            {onRemark && (
-                                <Button onClick = {() => onView(mark)}>Remark</Button>
-                            )}
-                        </TableCell>
-                    </TableRow>
-                ))}
-            </TableBody>
-        </Table>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
     );
-};
+}

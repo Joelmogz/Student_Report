@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import { login } from '../services/api'; // or '@/services/api' if alias is set up
-import  useAuth  from '../context/AuthContext'; // or '@/context/AuthContext'
+import { login } from '../services/api';
+import useAuth from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardFooter, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { toast } from 'sonner';
 
 const LoginPage = () => {
     const { login: loginContext } = useAuth();
@@ -20,28 +18,30 @@ const LoginPage = () => {
             const res = await login(form);
             loginContext(res.data.user, res.data.token);
             setMessage('Login Successfully');
+            toast.success('Login Successfully');
             if (res.data.user.role === 'admin') navigate('/admin');
             else navigate('/student');
         } catch (err) {
             setMessage(err.response?.data?.message || 'Login failed');
+            toast.error(err.response?.data?.message || 'Login failed');
         }
     };
 
     return (
-        <Card bg-gray-200>
-            <form onSubmit={handleSubmit}>
-                <CardHeader>
-                    <CardTitle className="font-bold text-3xl w-full">Login</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Input name="email" type="email" value={form.email} onChange={handleChange} placeholder="Email" className="shadow border rounded" />
-                    <Input name="password" type="password" value={form.password} onChange={handleChange} placeholder="Password" className="shadow border rounded" />
-                    <Button type="submit">Login</Button>
-                    <p>{message}</p>
-                </CardContent>
-                <CardFooter className="text-sm bg-grey-100">Enter Your Login Details</CardFooter>
+        <div className="flex justify-center items-center min-h-[80vh] bg-base-100">
+            <form onSubmit={handleSubmit} className="card w-full max-w-md bg-base-200 shadow-xl p-8">
+                <div className="card-body">
+                    <h2 className="card-title text-3xl font-bold mb-4">Login</h2>
+                    <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="Email" className="input input-bordered w-full mb-3" />
+                    <input name="password" type="password" value={form.password} onChange={handleChange} placeholder="Password" className="input input-bordered w-full mb-3" />
+                    <button type="submit" className="btn btn-primary w-full">Login</button>
+                    {message && <p className="mt-2 text-center text-error">{message}</p>}
+                    <div className="card-actions justify-end mt-4">
+                        <span className="text-sm text-gray-500">Enter Your Login Details</span>
+                    </div>
+                </div>
             </form>
-        </Card>
+        </div>
     );
 };
 
