@@ -4,6 +4,7 @@ import StudentList from '../components/StudentList';
 import PendingStudents from '../components/PendingStudent';
 import { toast } from 'sonner';
 import { saveAs } from 'file-saver';
+import { BellIcon } from '@heroicons/react/24/outline';
 
 function AdminDashboard() {
   const [students, setStudents] = useState([]);
@@ -20,6 +21,13 @@ function AdminDashboard() {
   const [showEditMarksModal, setShowEditMarksModal] = useState(false);
   const [editMarksForm, setEditMarksForm] = useState({ subject: '', marks: '', grade: 'A', remarks: '' });
   const [editMarkId, setEditMarkId] = useState(null);
+
+  // Mock re-evaluation requests
+  const [showNotifications, setShowNotifications] = useState(false);
+  const mockReevalRequests = [
+    { id: 1, student: 'John Doe', subject: 'Math', date: '2024-07-24' },
+    { id: 2, student: 'Jane Smith', subject: 'Science', date: '2024-07-23' },
+  ];
 
   useEffect(() => {
     getAllStudents().then(res => setStudents(res.data));
@@ -227,6 +235,38 @@ function AdminDashboard() {
 
   return (
     <div className="flex flex-col gap-8 items-center justify-center min-h-[80vh] bg-base-100">
+      {/* Notification Bell */}
+      <div className="w-full flex justify-end mb-2 relative">
+        <button className="btn btn-ghost btn-circle" aria-label="Show notifications" onClick={() => setShowNotifications(v => !v)}>
+          <BellIcon className="h-6 w-6" />
+          {(pending.length > 0 || mockReevalRequests.length > 0) && (
+            <span className="badge badge-error absolute top-0 right-0">{pending.length + mockReevalRequests.length}</span>
+          )}
+        </button>
+        {showNotifications && (
+          <div className="absolute right-0 mt-10 w-80 bg-base-200 shadow-lg rounded-lg z-50 p-4">
+            <h4 className="font-bold mb-2">Notifications</h4>
+            {pending.length > 0 && (
+              <div className="mb-2">
+                <span className="font-semibold">Pending Students:</span> {pending.length}
+              </div>
+            )}
+            {mockReevalRequests.length > 0 && (
+              <div>
+                <span className="font-semibold">Re-evaluation Requests:</span>
+                <ul className="list-disc ml-5">
+                  {mockReevalRequests.map(req => (
+                    <li key={req.id}>{req.student} requested re-evaluation for {req.subject} ({req.date})</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {pending.length === 0 && mockReevalRequests.length === 0 && (
+              <div>No new notifications</div>
+            )}
+          </div>
+        )}
+      </div>
       <div className="card w-full max-w-4xl bg-base-200 shadow-xl p-6">
         <h2 className="card-title text-2xl font-bold mb-4">Admin Dashboard</h2>
         <div className="flex flex-col md:flex-row gap-4 mb-4">
