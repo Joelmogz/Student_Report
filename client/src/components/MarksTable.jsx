@@ -2,7 +2,7 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { Button } from "@/components/ui/button";
 
 
-export default function MarksTable({marks, onEdit, onDelete, onRemark}) {
+export default function MarksTable({marks, onEdit, onDelete, onRemark, renderExtraActions}) {
     if(!marks || marks.length === 0) {
         return <p className="font-bold text-error text-3xl">No Marks found</p>
     }
@@ -26,7 +26,7 @@ export default function MarksTable({marks, onEdit, onDelete, onRemark}) {
                             <td>{mark.marks}</td>
                             <td>{mark.grade}</td>
                             <td>{mark.remarks}</td>
-                            {(onEdit || onDelete || onRemark) && (
+                            {(onEdit || onDelete || onRemark || renderExtraActions) && (
                                 <td className="flex gap-2">
                                     {onEdit && (
                                         <button className="btn btn-warning btn-xs" onClick={() => onEdit(mark)}>Edit</button>
@@ -37,6 +37,7 @@ export default function MarksTable({marks, onEdit, onDelete, onRemark}) {
                                     {onRemark && (
                                         <button className="btn btn-info btn-xs" onClick={() => onRemark(mark)}>Remark</button>
                                     )}
+                                    {renderExtraActions && renderExtraActions(mark)}
                                 </td>
                             )}
                         </tr>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-export default function StudentList({ students, onView, onEdit, onDelete, onSelectionChange }) {
+export default function StudentList({ students, onView, onEdit, onDelete, onSelectionChange, onGiveMarks }) {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState([]);
@@ -101,6 +101,9 @@ export default function StudentList({ students, onView, onEdit, onDelete, onSele
                 )}
                 {onDelete && (
                   <button className="btn btn-error btn-xs" onClick={() => onDelete(student)}>Delete</button>
+                )}
+                {onGiveMarks && (
+                  <button className="btn btn-success btn-xs" onClick={() => onGiveMarks(student)}>Give Marks</button>
                 )}
               </td>
             </tr>
