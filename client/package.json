@@ -21,6 +21,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "daisyui": "^4.12.24",
+    "file-saver": "^2.0.5",
     "heroicons": "^2.2.0",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
