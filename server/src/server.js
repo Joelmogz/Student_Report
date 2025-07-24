@@ -47,6 +47,7 @@ createDefaultAdmin();
 app.use('/api/auth', require('./routes/authRoute'));
 app.use('/api/students', require('./routes/studentRoute'));
 app.use('/api/marks', require('./routes/marksRoute'));
+app.use('/api/reevaluation-requests', require('./routes/reevaluationRoute'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

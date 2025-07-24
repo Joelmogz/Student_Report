@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { getProfile, getMyMarks, deleteMarks } from '../services/api';
+import { getProfile, getMyMarks, deleteMarks, createReevalRequest, getMyReevalRequests } from '../services/api';
 import MarksTable from '../components/MarksTable';
 import { toast } from 'sonner';
 import { Bar } from 'react-chartjs-2';
@@ -25,6 +25,8 @@ function StudentDashboard() {
   const [notifications, setNotifications] = useState([]);
   const [showReevalModal, setShowReevalModal] = useState(false);
   const [selectedMark, setSelectedMark] = useState(null);
+  const [reevalReason, setReevalReason] = useState('');
+  const [reevalRequests, setReevalRequests] = useState([]);
   const { theme, setTheme } = useTheme();
 
   // Track last seen marks and remarks in localStorage
@@ -64,6 +66,11 @@ function StudentDashboard() {
   useEffect(() => {
     getProfile().then(res => setProfile(res.data));
     getMyMarks().then(res => setMarks(res.data));
+  }, []);
+
+  // Fetch student's re-evaluation requests
+  useEffect(() => {
+    getMyReevalRequests().then(res => setReevalRequests(res.data)).catch(() => setReevalRequests([]));
   }, []);
 
   // Calculate analytics
@@ -114,12 +121,24 @@ function StudentDashboard() {
   // Handler for re-evaluation request
   const handleRequestReeval = (mark) => {
     setSelectedMark(mark);
+    setReevalReason('');
     setShowReevalModal(true);
   };
-  const handleSubmitReeval = () => {
-    toast.success('Re-evaluation request submitted! (placeholder)');
+  const handleSubmitReeval = async () => {
+    if (!selectedMark) return;
+    try {
+      await createReevalRequest({
+        marks: selectedMark._id,
+        subject: selectedMark.subject,
+        reason: reevalReason,
+      });
+      toast.success('Re-evaluation request submitted!');
+    } catch (err) {
+      toast.error(err?.response?.data?.message || 'Failed to submit re-evaluation request');
+    }
     setShowReevalModal(false);
     setSelectedMark(null);
+    setReevalReason('');
   };
   // Accessibility: Close modal on Escape
   const handleKeyDown = useCallback((e) => {
@@ -239,8 +258,38 @@ function StudentDashboard() {
         {/* Remarks & Feedback Section */}
         <div className="mt-6">
           {/* Show remarks and add re-evaluation request button/form */}
-          <div className="bg-base-300 p-4 rounded">
+          <div className="bg-base-300 p-4 rounded mb-4">
             <p>To request a re-evaluation for a mark, use the button in the table above.</p>
+          </div>
+          {/* Re-evaluation Requests History */}
+          <div className="bg-base-300 p-4 rounded">
+            <h4 className="font-bold mb-2">My Re-evaluation Requests</h4>
+            {reevalRequests.length > 0 ? (
+              <table className="table table-zebra w-full">
+                <thead>
+                  <tr>
+                    <th>Subject</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Admin Remark</th>
+                    <th>Requested</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reevalRequests.map(req => (
+                    <tr key={req._id}>
+                      <td>{req.subject}</td>
+                      <td>{req.reason}</td>
+                      <td>{req.status}</td>
+                      <td>{req.adminRemark || '-'}</td>
+                      <td>{new Date(req.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="text-center">No re-evaluation requests found</div>
+            )}
           </div>
         </div>
 
@@ -256,6 +305,13 @@ function StudentDashboard() {
           >
             <h4 className="font-bold mb-2">Request Re-evaluation</h4>
             <p className="mb-4">Subject: {selectedMark?.subject}</p>
+            <textarea
+              className="textarea textarea-bordered w-full mb-4"
+              placeholder="Reason for re-evaluation (optional)"
+              value={reevalReason}
+              onChange={e => setReevalReason(e.target.value)}
+              rows={3}
+            />
             <button className="btn btn-primary w-full" onClick={handleSubmitReeval}>Submit Request</button>
             <button className="btn btn-ghost w-full mt-2" onClick={() => setShowReevalModal(false)}>Cancel</button>
           </div>

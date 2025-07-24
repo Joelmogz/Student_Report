@@ -40,4 +40,10 @@ export const updateMarks = (marksId, data) => API.patch(`/marks/${marksId}`, dat
 export const deleteMarks = (marksId) => API.delete(`/marks/${marksId}`);
 export const getMarksByStudent = (studentId) => API.get(`/marks/student/${studentId}`);
 
+// Re-evaluation Requests
+export const createReevalRequest = (data) => API.post('/reevaluation-requests', data);
+export const getAllReevalRequests = () => API.get('/reevaluation-requests');
+export const getMyReevalRequests = () => API.get('/reevaluation-requests/my');
+export const updateReevalRequestStatus = (id, status, adminRemark) => API.patch(`/reevaluation-requests/${id}/status`, { status, adminRemark });
+
 export default API;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAllStudents, getPendingStudents, approveStudent, rejectStudent, removeStudent, getStudentById, createMarks, getMarksByStudent, updateMarks } from '../services/api';
+import { getAllStudents, getPendingStudents, approveStudent, rejectStudent, removeStudent, getStudentById, createMarks, getMarksByStudent, updateMarks, getAllReevalRequests, updateReevalRequestStatus } from '../services/api';
 import StudentList from '../components/StudentList';
 import PendingStudents from '../components/PendingStudent';
 import { toast } from 'sonner';
@@ -24,14 +24,18 @@ function AdminDashboard() {
 
   // Mock re-evaluation requests
   const [showNotifications, setShowNotifications] = useState(false);
-  const mockReevalRequests = [
-    { id: 1, student: 'John Doe', subject: 'Math', date: '2024-07-24' },
-    { id: 2, student: 'Jane Smith', subject: 'Science', date: '2024-07-23' },
-  ];
+  const [reevalRequests, setReevalRequests] = useState([]);
+  const [reevalActionModal, setReevalActionModal] = useState({ open: false, id: null, status: '', defaultRemark: '' });
+  const [adminRemark, setAdminRemark] = useState('');
 
   useEffect(() => {
     getAllStudents().then(res => setStudents(res.data));
     getPendingStudents().then(res => setPending(res.data));
+  }, []);
+
+  // Fetch real re-evaluation requests (admin)
+  useEffect(() => {
+    getAllReevalRequests().then(res => setReevalRequests(res.data)).catch(() => setReevalRequests([]));
   }, []);
 
   const handleApprove = async (studentId) => {
@@ -208,6 +212,23 @@ function AdminDashboard() {
     }
   };
 
+  // Approve/Reject re-evaluation request (with remark)
+  const handleReevalAction = (id, status) => {
+    setReevalActionModal({ open: true, id, status, defaultRemark: '' });
+    setAdminRemark('');
+  };
+  const handleSubmitReevalAction = async () => {
+    try {
+      await updateReevalRequestStatus(reevalActionModal.id, reevalActionModal.status, adminRemark);
+      toast.success(`Request ${reevalActionModal.status}`);
+      setReevalRequests(reqs => reqs.filter(r => r._id !== reevalActionModal.id));
+    } catch (err) {
+      toast.error(err?.response?.data?.message || `Failed to ${reevalActionModal.status} request`);
+    }
+    setReevalActionModal({ open: false, id: null, status: '', defaultRemark: '' });
+    setAdminRemark('');
+  };
+
   // Filter students by search and status
   const filteredStudents = students.filter(student => {
     const matchesSearch =
@@ -239,8 +260,8 @@ function AdminDashboard() {
       <div className="w-full flex justify-end mb-2 relative">
         <button className="btn btn-ghost btn-circle" aria-label="Show notifications" onClick={() => setShowNotifications(v => !v)}>
           <BellIcon className="h-6 w-6" />
-          {(pending.length > 0 || mockReevalRequests.length > 0) && (
-            <span className="badge badge-error absolute top-0 right-0">{pending.length + mockReevalRequests.length}</span>
+          {(pending.length > 0 || reevalRequests.length > 0) && (
+            <span className="badge badge-error absolute top-0 right-0">{pending.length + reevalRequests.length}</span>
           )}
         </button>
         {showNotifications && (
@@ -251,17 +272,26 @@ function AdminDashboard() {
                 <span className="font-semibold">Pending Students:</span> {pending.length}
               </div>
             )}
-            {mockReevalRequests.length > 0 && (
+            {reevalRequests.length > 0 && (
               <div>
                 <span className="font-semibold">Re-evaluation Requests:</span>
                 <ul className="list-disc ml-5">
-                  {mockReevalRequests.map(req => (
-                    <li key={req.id}>{req.student} requested re-evaluation for {req.subject} ({req.date})</li>
+                  {reevalRequests.map(req => (
+                    <li key={req._id} className="mb-2">
+                      {req.student?.fullName || 'Unknown'} requested re-evaluation for {req.subject} ({new Date(req.createdAt).toLocaleDateString()})
+                      {req.reason && (
+                        <div className="text-xs text-gray-600 mt-1">Reason: {req.reason}</div>
+                      )}
+                      <div className="flex gap-2 mt-1">
+                        <button className="btn btn-xs btn-success" onClick={() => handleReevalAction(req._id, 'approved')}>Approve</button>
+                        <button className="btn btn-xs btn-error" onClick={() => handleReevalAction(req._id, 'rejected')}>Reject</button>
+                      </div>
+                    </li>
                   ))}
                 </ul>
               </div>
             )}
-            {pending.length === 0 && mockReevalRequests.length === 0 && (
+            {pending.length === 0 && reevalRequests.length === 0 && (
               <div>No new notifications</div>
             )}
           </div>
@@ -411,6 +441,23 @@ function AdminDashboard() {
             <button className="btn btn-primary w-full" type="submit">Update</button>
             <button className="btn btn-ghost w-full mt-2" type="button" onClick={() => setShowEditMarksModal(false)}>Cancel</button>
           </form>
+        </div>
+      )}
+      {reevalActionModal.open && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="bg-white p-6 rounded shadow-xl w-full max-w-sm">
+            <h4 className="font-bold mb-2">{reevalActionModal.status === 'approved' ? 'Approve' : 'Reject'} Re-evaluation Request</h4>
+            <label className="block mb-1">Admin Remark (optional)</label>
+            <textarea
+              className="textarea textarea-bordered w-full mb-4"
+              placeholder="Enter a remark for the student"
+              value={adminRemark}
+              onChange={e => setAdminRemark(e.target.value)}
+              rows={3}
+            />
+            <button className="btn btn-primary w-full" onClick={handleSubmitReevalAction}>Submit</button>
+            <button className="btn btn-ghost w-full mt-2" onClick={() => setReevalActionModal({ open: false, id: null, status: '', defaultRemark: '' })}>Cancel</button>
+          </div>
         </div>
       )}
     </div>
