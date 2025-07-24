@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Clean install backend dependencies
+        run: |
+          cd server
+          npm ci
+
+      - name: Remove node_modules and lockfile (frontend)
+        run: |
+          cd client
+          rm -rf node_modules package-lock.json
+
+      - name: Install frontend dependencies
+        run: |
+          cd client
+          npm install
+
+      # Add your test scripts here if you have them
+      # - name: Run backend tests
+      #   run: |
+      #     cd server
+      #     npm test
+
+      # - name: Run frontend tests
+      #   run: |
+      #     cd client
+      #     npm test
+
+      - name: Build frontend
+        run: |
+          cd client
+          npm run build 
