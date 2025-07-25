@@ -10,15 +10,20 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-if (process.env.NODE_ENV === 'production') {
-  app.use(cors({
-    origin: student-report-one.vercel.app
-    ,
-    credentials: true
-  }));
-} else {
-  app.use(cors());
-}
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://student-report-one.vercel.app",
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+}));
 
 // Connect to MongoDB
 connectDB();
