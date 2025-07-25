@@ -22,6 +22,10 @@ if (process.env.NODE_ENV === 'production') {
 // Connect to MongoDB
 connectDB();
 
+app.get('/', (req, res) => {
+  res.send('Student Report API is live 🚀');
+});
+
 // Create default admin if not exists
 const createDefaultAdmin = async () => {
   try {
