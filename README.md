@@ -4,6 +4,9 @@ A full-stack web application for managing student marks, analytics, feedback, an
 
 ---
 
+## 📄 Pitch Deck
+- [Gamma App Docs](https://gamma.app/docs/Student-Report-System-Modern-Academic-Management-for-Schools-gwnx8k2lfa7281n)
+Access my pitch desk at https://gamma.app/docs/Student-Report-System-Modern-Academic-Management-for-Schools-gwnx8k2lfa7281n
 ## Features
 
 ### Student Dashboard
@@ -71,6 +74,7 @@ A full-stack web application for managing student marks, analytics, feedback, an
      ```
 
 ---
+
 
 ## Running Locally
 
