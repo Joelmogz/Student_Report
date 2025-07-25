@@ -12,7 +12,8 @@ app.use(express.json());
 
 if (process.env.NODE_ENV === 'production') {
   app.use(cors({
-    origin: process.env.CLIENT_URL,
+    origin: student-report-one.vercel.app
+    ,
     credentials: true
   }));
 } else {
