@@ -17,33 +17,18 @@ jobs:
         with:
           node-version: 20
 
-      - name: Clean install backend dependencies
-        run: |
-          cd server
-          npm ci
+      - name: Install pnpm
+        run: npm install -g pnpm
 
-      - name: Remove node_modules and lockfile (frontend)
-        run: |
-          cd client
-          rm -rf node_modules package-lock.json
-
-      - name: Install frontend dependencies
-        run: |
-          cd client
-          npm install
+      - name: Install dependencies (pnpm)
+        run: pnpm install
 
       # Add your test scripts here if you have them
       # - name: Run backend tests
-      #   run: |
-      #     cd server
-      #     npm test
+      #   run: pnpm --filter server test
 
       # - name: Run frontend tests
-      #   run: |
-      #     cd client
-      #     npm test
+      #   run: pnpm --filter client test
 
       - name: Build frontend
-        run: |
-          cd client
-          npm run build 
+        run: pnpm --filter client run build 
