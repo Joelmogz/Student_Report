@@ -110,8 +110,6 @@ A full-stack web application for managing student marks, analytics, feedback, an
 
 ---
 
-## Real-Time Features
-- Uses Socket.IO for instant notifications between students and admins (e.g., re-evaluation requests).
 
 ---
 
